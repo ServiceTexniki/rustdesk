@@ -30,6 +30,10 @@ jobs:
         run: |
           choco install python --version=3.10.11 -y
           python --version
+      
+      - name: Install Windows SDK
+        run: choco install windows-sdk-10-version-2004-all -y
+
 
       - name: Build Windows release
         run: |
