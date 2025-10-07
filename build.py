@@ -272,7 +272,7 @@ def external_resources(flutter, args, res_dir):
 
 
 def get_features(args):
-    features = ['inline'] if not args.flutter else []
+    features = []
     if args.hwcodec:
         features.append('hwcodec')
     if args.vram:
