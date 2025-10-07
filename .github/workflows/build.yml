@@ -1,12 +1,22 @@
+name: Build RustDesk (Windows + Android)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
   build-windows:
+    name: 🪟 Build Windows GUI
     runs-on: windows-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up environment
+      - name: Setup environment variables
         run: |
           echo "RUSTDESK_RELAY=$env:RELAY_SERVER" | Out-File -FilePath .env -Encoding utf8 -Append
           echo "RUSTDESK_RENDEZVOUS=$env:RENDEZVOUS_SERVER" | Out-File -FilePath .env -Encoding utf8 -Append
@@ -16,17 +26,59 @@
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
-      - name: Install dependencies
+      - name: Install Python
         run: |
-          choco install python -y
+          choco install python --version=3.10.11 -y
           python --version
 
-      - name: Build Windows GUI (RustDesk)
+      - name: Build Windows release
         run: |
           python build.py --platform windows --release
 
-      - name: Upload Windows artifact
+      - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
           name: rustdesk-windows
           path: dist/
+
+  build-android:
+    name: 🤖 Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl unzip python3 git
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Verify Flutter setup
+        run: flutter doctor -v
+
+      - name: Configure environment variables
+        run: |
+          echo "RUSTDESK_RELAY=${{ secrets.RELAY_SERVER }}" >> .env
+          echo "RUSTDESK_RENDEZVOUS=${{ secrets.RENDEZVOUS_SERVER }}" >> .env
+          echo "RUSTDESK_KEY=${{ secrets.ENCRYPT_KEY }}" >> .env
+
+      - name: Build Android APK (release)
+        run: |
+          cd flutter
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-android
+          path: flutter/build/app/outputs/flutter-apk/app-release.apk
