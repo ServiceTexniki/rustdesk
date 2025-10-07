@@ -40,7 +40,3 @@ jobs:
         with:
           name: rustdesk-windows
           path: dist/
-
-
-          name: rustdesk-android
-          path: flutter/build/app/outputs/flutter-apk/app-release.apk
