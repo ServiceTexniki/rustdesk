@@ -34,7 +34,7 @@ jobs:
 
       - name: Build Windows release
         run: |
-          python build.py 
+          python build.py --flutter --portable
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
