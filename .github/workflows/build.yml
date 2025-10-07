@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Windows release
         run: |
-          python build.py --platform windows --release
+          python build.py --flutter --release
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
@@ -41,44 +41,6 @@ jobs:
           name: rustdesk-windows
           path: dist/
 
-  build-android:
-    name: 🤖 Build Android APK
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl unzip python3 git
-
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-
-      - name: Verify Flutter setup
-        run: flutter doctor -v
-
-      - name: Configure environment variables
-        run: |
-          echo "RUSTDESK_RELAY=${{ secrets.RELAY_SERVER }}" >> .env
-          echo "RUSTDESK_RENDEZVOUS=${{ secrets.RENDEZVOUS_SERVER }}" >> .env
-          echo "RUSTDESK_KEY=${{ secrets.ENCRYPT_KEY }}" >> .env
-
-      - name: Build Android APK (release)
-        run: |
-          cd flutter
-          flutter pub get
-          flutter build apk --release
-
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v4
-        with:
           name: rustdesk-android
           path: flutter/build/app/outputs/flutter-apk/app-release.apk
