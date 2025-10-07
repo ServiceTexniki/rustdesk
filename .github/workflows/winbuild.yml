@@ -53,7 +53,7 @@ jobs:
 
       - name: Install LLVM/Clang (for bindgen)
         run: |
-          choco install -y llvm --version=15.0.2
+          choco install -y llvm --version=15.0.2 --allow-downgrade
           echo "LIBCLANG_PATH=C:\\Program Files\\LLVM\\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Install Git & vcpkg dependencies
