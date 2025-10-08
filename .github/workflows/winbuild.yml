@@ -101,11 +101,15 @@ jobs:
             Write-Error "config.rs not found: repo structure changed?"; exit 1
           }
           foreach ($f in $candidateFiles) {
-            (Get-Content $f.FullName) | 
-              ForEach-Object {
-                $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RENDEZVOUS_SERVER\s*:\s*&str\s*=\s*)"[^"]*"', "$1\"$env:RENDEZVOUS_SERVER\"" |
-                ForEach-Object { $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RS_PUB_KEY\s*:\s*&str\s*=\s*)"[^"]*"', "$1\"$env:RS_PUB_KEY\"" } |
-                ForEach-Object { $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RELAY_SERVER\s*:\s*&str\s*=\s*)"[^"]*"', "$1\"$env:RELAY_SERVER\"" }
+          (Get-Content $f.FullName) |
+            ForEach-Object {
+              $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RENDEZVOUS_SERVER\s*:\s*&str\s*=\s*")[^"]*"', "`$1`"$env:RENDEZVOUS_SERVER`""
+            } |
+            ForEach-Object {
+              $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RS_PUB_KEY\s*:\s*&str\s*=\s*")[^"]*"', "`$1`"$env:RS_PUB_KEY`""
+              } |
+            ForEach-Object {
+              $_ -replace '(?m)^(\s*pub\s+const\s+DEFAULT_RELAY_SERVER\s*:\s*&str\s*=\s*")[^"]*"', "`$1`"$env:RELAY_SERVER`""
               } | Set-Content $f.FullName -Encoding UTF8
           }
 
